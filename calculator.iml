@@ -8,5 +8,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-sdk-2.12.1" level="application" />
+    <orderEntry type="library" name="org.scalatest:scalatest_2.12:3.0.1" level="project" />
+    <orderEntry type="library" name="org.scalactic:scalactic_2.12:3.0.1" level="project" />
   </component>
 </module>
