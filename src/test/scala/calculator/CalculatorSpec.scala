@@ -1,9 +1,9 @@
-package test
+package test.scala.calculator
 
 import org.scalatest.FlatSpec
-import Calculator.Calculator
+import main.scala.calculator.Calculator
 
-class CalculatorTests extends FlatSpec {
+class CalculatorSpec extends FlatSpec {
   behavior of "Calculator Calc method"
 
   it should "sum two positive integer numbers" in {
