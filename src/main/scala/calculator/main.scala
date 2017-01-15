@@ -1,8 +1,11 @@
 package main.scala.calculator
 
 object Main extends App {
-  var input = scala.io.StdIn.readLine()
+  val input: String = scala.io.StdIn.readLine()
   println(s"input:  ${input}")
-  val output = new Calculator().Calc(input)
-  println(s"output: ${output}")
+  val output: Either[String, ParsingError] = new Calculator().Calc(input)
+  output match {
+    case Left(result) => println(s"output: ${result}")
+    case Right(error) => println(s"output: ERROR. ${error.Message}")
+  }
 }
