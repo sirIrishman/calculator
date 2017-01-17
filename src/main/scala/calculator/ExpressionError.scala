@@ -1,5 +1,5 @@
 package main.scala.calculator
 
-class ParsingError(message: String) {
+class ExpressionError(message: String) {
   def Message: String = message
 }

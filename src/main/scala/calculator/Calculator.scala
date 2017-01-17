@@ -1,7 +1,7 @@
 package main.scala.calculator
 
 class Calculator {
-  def CalcInfix(input: String): Either[String, ParsingError] = {
+  def CalcInfix(input: String): Either[String, ExpressionError] = {
     val sanitizedInput = input.filter(ch => !ch.isSpaceChar)
 
     val infixOperands = sanitizedInput.toList
@@ -12,7 +12,7 @@ class Calculator {
       case Right(x) => return Right(x)
     }
 
-    PostfixEvaluator.Evaluate(postfixOperands) match {
+    PostfixExpressionEvaluator.Evaluate(postfixOperands) match {
       case Left(x) => Left(x.toString)
       case Right(x) => Right(x)
     }

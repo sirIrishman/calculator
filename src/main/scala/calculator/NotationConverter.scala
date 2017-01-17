@@ -1,7 +1,6 @@
 package main.scala.calculator
 
-import scala.collection.mutable.Stack
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{Stack, ListBuffer}
 
 object NotationConverter {
   // https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages
@@ -12,19 +11,21 @@ object NotationConverter {
   )
   val Operators = Precedence.keys.toList
 
-  def FromInfixToPostfix(operands: List[Char]): Either[List[Char], ParsingError] = {
+  def FromInfixToPostfix(operands: List[Char]): Either[List[Char], ExpressionError] = {
     val result = ListBuffer[Char]()
     val operatorsStack = Stack[Char]()
     operands.foreach(token => {
       token match {
-        case number if number isDigit => result += number
-        case '(' => operatorsStack.push(token)
+        case number if number isDigit =>
+          result += number
+        case '(' =>
+          operatorsStack.push(token)
         case ')' => {
           while (!operatorsStack.isEmpty && operatorsStack.head != '(') {
             result += operatorsStack.pop()
           }
           if (operatorsStack.isEmpty) {
-            return Right(new ParsingError(s"Parentheses are not balanced"))
+            return Right(new ExpressionError(s"Parentheses are not balanced"))
           }
           operatorsStack.pop()
         }
@@ -34,7 +35,8 @@ object NotationConverter {
           }
           operatorsStack.push(operator)
         }
-        case _ => return Right(new ParsingError(s"Failed to parse '${token}' token"))
+        case _ =>
+          return Right(new ExpressionError(s"Failed to parse '${token}' token"))
       }
     })
     result ++= operatorsStack.toList
