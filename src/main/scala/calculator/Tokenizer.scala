@@ -6,7 +6,7 @@ object Tokenizer {
 
   object CharType extends Enumeration {
     type CharType = Value
-    val Space, Digit, DecimalMark, Parenthesis = Value
+    val Space, Digit, DecimalMark, Operator = Value
   }
 
   import CharType._
@@ -26,7 +26,7 @@ object Tokenizer {
         }
         case (Digit, Some(Digit)) | (Digit, Some(DecimalMark)) | (DecimalMark, Some(Digit)) =>
           accumulator += current
-        case (_, Some(Space)) | (_, None) | (_, Some(Parenthesis)) | (Parenthesis, _) => {
+        case (_, Some(Space)) | (_, None) | (_, Some(Operator)) | (Operator, _) => {
           accumulator += current
           result += new Token(accumulator.map(x => x._1) mkString, accumulator.head._3)
           accumulator.clear()
@@ -43,7 +43,7 @@ object Tokenizer {
       case _ if char isDigit => Digit
       case _ if char isSpaceChar => Space
       case '.' => DecimalMark
-      case '(' | ')' => Parenthesis
+      case '+' | '-' | '*' | '/' | '(' | ')' => Operator
     }
   }
 }
