@@ -4,12 +4,17 @@ import scala.collection.mutable.ListBuffer
 
 object Tokenizer {
 
-  object CharType extends Enumeration {
+  private object CharType extends Enumeration {
     type CharType = Value
     val Space, Digit, DecimalMark, Operator = Value
   }
 
   import CharType._
+
+  private val CharTypeToTokenType = Map(
+    CharType.Digit -> TokenType.Number,
+    CharType.Operator -> TokenType.Operator
+  )
 
   def Tokenize(input: String): Either[List[Token], ExpressionError] = {
     val result = ListBuffer[Token]()
@@ -20,7 +25,7 @@ object Tokenizer {
       (current._2, nextCharType) match {
         case (Space, _) => {
           if (!accumulator.isEmpty) {
-            result += new Token(accumulator.map(x => x._1) mkString, accumulator.head._3)
+            result += new Token(accumulator.map(x => x._1) mkString, CharTypeToTokenType(accumulator.head._2), accumulator.head._3)
             accumulator.clear()
           }
         }
@@ -28,11 +33,11 @@ object Tokenizer {
           accumulator += current
         case (_, Some(Space)) | (_, None) | (_, Some(Operator)) | (Operator, _) => {
           accumulator += current
-          result += new Token(accumulator.map(x => x._1) mkString, accumulator.head._3)
+          result += new Token(accumulator.map(x => x._1) mkString, CharTypeToTokenType(accumulator.head._2), accumulator.head._3)
           accumulator.clear()
         }
         case _ =>
-          return Right(new ExpressionError(s"Failed to parse '${(accumulator += current) mkString}' token"))
+          return Right(new ExpressionError(s"Failed to parse '${(accumulator += current) mkString}':${accumulator.head._3} token"))
       }
     }
     Left(result.toList)

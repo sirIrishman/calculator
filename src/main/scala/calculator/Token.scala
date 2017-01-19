@@ -1,7 +1,11 @@
 package main.scala.calculator
 
-class Token(text: String, position: Int) {
+import main.scala.calculator.TokenType._
+
+class Token(text: String, `type`: TokenType, position: Int) {
   def Text = text
+
+  def Type = `type`
 
   def Position = position
 
@@ -16,8 +20,9 @@ class Token(text: String, position: Int) {
   override def hashCode: Int = {
     val prime = 31
     var result = 1
-    result = prime * result + position;
-    result = prime * result + (if (text == null) 0 else text.hashCode)
+    result = prime * result + (if (Text == null) 0 else Text.hashCode)
+    result = prime * result + Type.hashCode();
+    result = prime * result + Position;
     return result
   }
 
