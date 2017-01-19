@@ -2,7 +2,7 @@ package main.scala.calculator
 
 object Main extends App {
   val input: String = scala.io.StdIn.readLine()
-  println(s"input:  ${input}")
+  println(s" input: ${input}")
   val output: Either[String, ExpressionError] = new Calculator().CalcInfix(input)
   output match {
     case Left(result) => println(s"output: ${result}")
