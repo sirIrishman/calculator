@@ -1,7 +1,7 @@
 package test.scala.calculator
 
 import org.scalatest.FlatSpec
-import main.scala.calculator.{Tokenizer, Token, TokenType}
+import main.scala.calculator._
 
 class TokenizerSpec extends FlatSpec {
   behavior of "Tokenizer Tokenize method"
