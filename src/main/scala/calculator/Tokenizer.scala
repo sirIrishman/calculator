@@ -11,36 +11,53 @@ object Tokenizer {
 
   import CharType._
 
-  private val CharTypeToTokenType = Map(
-    CharType.Digit -> TokenType.Number,
-    CharType.Operator -> TokenType.Operator
-  )
-
   def Tokenize(input: String): Either[List[Token], ExpressionError] = {
-    val result = ListBuffer[Token]()
     val accumulator = ListBuffer[(Char, CharType, Int)]()
+
+    def CreateToken(): Either[Token, ExpressionError] = {
+      val text: String = accumulator.map(x => x._1) mkString
+      val position: Int = accumulator.head._3
+      val tokenType = DetermineTokenType(accumulator.map(x => x._2).toList)
+        .getOrElse(return Right(new ExpressionError(s"Failed to parse '${text}':${position} token")))
+      Left(new Token(text, tokenType, position))
+    }
+
+    val tokens = ListBuffer[Token]()
     for ((currentChar: Char, index: Int) <- input.view.zipWithIndex) {
       val current = (currentChar, GetCharType(currentChar), index)
       val nextCharType = if (index + 1 == input.length) None else Some(GetCharType(input(index + 1)))
       (current._2, nextCharType) match {
         case (Space, _) => {
           if (!accumulator.isEmpty) {
-            result += new Token(accumulator.map(x => x._1) mkString, CharTypeToTokenType(accumulator.head._2), accumulator.head._3)
+            CreateToken() match {
+              case Left(newToken) => tokens += newToken
+              case Right(error) => return Right(error)
+            }
             accumulator.clear()
           }
         }
-        case (Digit, Some(Digit)) | (Digit, Some(DecimalMark)) | (DecimalMark, Some(Digit)) =>
+        case (Operator, Some(Digit)) if currentChar == '-' && (tokens.isEmpty || tokens.last.Type == TokenType.Operator && tokens.last.Text != ")") =>
           accumulator += current
-        case (_, Some(Space)) | (_, None) | (_, Some(Operator)) | (Operator, _) => {
+        case (Digit, Some(Digit)) |
+             (Digit, Some(DecimalMark)) |
+             (DecimalMark, Some(Digit)) =>
           accumulator += current
-          result += new Token(accumulator.map(x => x._1) mkString, CharTypeToTokenType(accumulator.head._2), accumulator.head._3)
+        case (_, Some(Space)) |
+             (_, Some(Operator)) |
+             (_, None) |
+             (Operator, _) => {
+          accumulator += current
+          CreateToken() match {
+            case Left(newToken) => tokens += newToken
+            case Right(error) => return Right(error)
+          }
           accumulator.clear()
         }
         case _ =>
           return Right(new ExpressionError(s"Failed to parse '${(accumulator += current) mkString}':${accumulator.head._3} token"))
       }
     }
-    Left(result.toList)
+    Left(tokens.toList)
   }
 
   private def GetCharType(char: Char): CharType = {
@@ -51,5 +68,26 @@ object Tokenizer {
       case '+' | '-' | '*' | '/' | '(' | ')' => Operator
     }
   }
-}
 
+  private def DetermineTokenType(charTypes: List[CharType]): Option[TokenType.TokenType] = {
+    return charTypes.aggregate(List[CharType]())(
+      (x, y) => {
+        if ((x.isEmpty || x.last != y) && y != Nil) {
+          x :+ y
+        } else {
+          x
+        }
+      },
+      (x, y) => x ::: y
+    ) match {
+      case Digit :: Nil |
+           Digit :: DecimalMark :: Digit :: Nil |
+           Operator :: Digit :: Nil |
+           Operator :: Digit :: DecimalMark :: Digit :: Nil =>
+        Some(TokenType.Number)
+      case Operator :: Nil =>
+        Some(TokenType.Operator)
+      case _ => None
+    }
+  }
+}
