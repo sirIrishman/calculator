@@ -5,16 +5,16 @@ class Calculator {
     val safeInput = if (input == null) "" else input
 
     val infixOperandTokens = Tokenizer.Tokenize(safeInput) match {
-      case Left(x) => x
-      case Right(x) => return Right(x)
+      case Left(tokens) => tokens
+      case Right(error) => return Right(error)
     }
     val postfixOperands = NotationConverter.FromInfixToPostfix(infixOperandTokens) match {
-      case Left(x) => x
-      case Right(x) => return Right(x)
+      case Left(tokens) => tokens
+      case Right(error) => return Right(error)
     }
     PostfixExpressionEvaluator.Evaluate(postfixOperands) match {
-      case Left(x) => Left(x.toString)
-      case Right(x) => Right(x)
+      case Left(result) => Left(result.toString)
+      case Right(error) => Right(error)
     }
   }
 }
