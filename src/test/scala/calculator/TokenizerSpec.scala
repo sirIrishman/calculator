@@ -159,5 +159,12 @@ class TokenizerSpec extends FlatSpec {
         new Token("1", TokenKind.Number, 27),
         new Token(")", TokenKind.Operator, 29)
       )))
+
+  }
+  //invalid expressions
+  it should "return an error when tokens are unrecognizable" in {
+    assert(Tokenizer.tokenize("12.34.56") == Right(new ExpressionError("Failed to parse '12.34.56':0 token")))
+    assert(Tokenizer.tokenize("12..34") == Right(new ExpressionError("Failed to parse '12.':0 token")))
+    assert(Tokenizer.tokenize(".12") == Right(new ExpressionError("Failed to parse '.12':0 token")))
   }
 }

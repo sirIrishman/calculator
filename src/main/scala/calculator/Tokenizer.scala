@@ -28,15 +28,10 @@ object Tokenizer {
       val nextCharType = if (index + 1 == expression.length) None else Some(getCharType(expression(index + 1)))
       (current._2, nextCharType) match {
         case (Space, _) => {
-          if (!accumulator.isEmpty) {
-            createTokenFromAccumulator() match {
-              case Left(newToken) => tokens += newToken
-              case Right(error) => return Right(error)
-            }
-            accumulator.clear()
-          }
+          //do nothing
         }
-        case (Operator, Some(Digit)) if currentChar == '-' && (tokens.isEmpty || tokens.last.kind == TokenKind.Operator && tokens.last.text != ")") =>
+        case (Operator, Some(Digit))
+          if currentChar == '-' && (tokens.isEmpty || tokens.last.kind == TokenKind.Operator && tokens.last.text != ")") =>
           accumulator += current
         case (Digit, Some(Digit)) |
              (Digit, Some(DecimalMark)) |
@@ -54,7 +49,8 @@ object Tokenizer {
           accumulator.clear()
         }
         case _ =>
-          return Right(new ExpressionError(s"Failed to parse '${(accumulator += current) mkString}':${accumulator.head._3} token"))
+          accumulator += current
+          return Right(new ExpressionError(s"Failed to parse '${accumulator.map(_._1) mkString}':${accumulator.head._3} token"))
       }
     }
     Left(tokens.toList)

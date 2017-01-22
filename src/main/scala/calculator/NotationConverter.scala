@@ -44,6 +44,9 @@ object NotationConverter {
           return Right(new ExpressionError(s"Failed to parse ${token} token"))
       }
     })
+    if (operatorsStack.exists(token => token.text == "(")) {
+      return Right(new ExpressionError(s"Parentheses are not balanced"))
+    }
     postfixTokens ++= operatorsStack.toList
     Left(postfixTokens.toList)
   }

@@ -36,4 +36,25 @@ class PostfixExpressionEvaluatorSpec extends FlatSpec {
   it should "divide and divide positive numbers with positive result" in {
     assert(PostfixExpressionEvaluator.evaluate(Tokenize("60.003 3 / 1 -")) == Left(19.001))
   }
+
+  //invalid expressions
+  it should "return an error when can't find sufficient number of operator parameters" in {
+    assert(PostfixExpressionEvaluator.evaluate(Tokenize("4+")) == Right(new ExpressionError("Insufficient number of operands for '+':1 operator")))
+    assert(PostfixExpressionEvaluator.evaluate(Tokenize("34--")) == Right(new ExpressionError("Insufficient number of operands for '-':2 operator")))
+    assert(PostfixExpressionEvaluator.evaluate(Tokenize("1 2 * /")) == Right(new ExpressionError("Insufficient number of operands for '/':6 operator")))
+  }
+
+  it should "return an error when operator is unknown" in {
+    assert(PostfixExpressionEvaluator.evaluate(List[Token](
+      new Token("1", TokenKind.Number, 0),
+      new Token("2", TokenKind.Number, 1),
+      new Token("~", TokenKind.Operator, 2)
+    )) == Right(new ExpressionError("Failed to parse '~':2 token")))
+  }
+
+  it should "return an error when few operands are left after evaluation" in {
+    assert(PostfixExpressionEvaluator.evaluate(Tokenize("1 2")) == Right(new ExpressionError("Invalid expression")))
+  }
+
+  // TODO check numbers parsing
 }

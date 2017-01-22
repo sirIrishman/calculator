@@ -20,4 +20,10 @@ class TokenSpec extends FlatSpec {
     assert(new Token("12", TokenKind.Number, 0).equals(new Token("12", TokenKind.Operator, 0)) == false)
     assert(new Token("12", TokenKind.Number, 0).equals(new Token("12", TokenKind.Number, 1)) == false)
   }
+
+  it should "return false for other types" in {
+    assert(new Token("12", TokenKind.Number, 0).equals("Token") == false)
+    assert(new Token("12", TokenKind.Number, 0).equals(158) == false)
+    assert(new Token("12", TokenKind.Number, 0).equals(TokenKind.Number) == false)
+  }
 }

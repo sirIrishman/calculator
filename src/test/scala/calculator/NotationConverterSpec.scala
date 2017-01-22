@@ -119,4 +119,16 @@ class NotationConverterSpec extends FlatSpec {
       ))
     )
   }
+
+  //invalid expressions
+  it should "return an error when parentheses aren't balanced" in {
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("4-2)")) == Right(new ExpressionError("Parentheses are not balanced")))
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("(4-2")) == Right(new ExpressionError("Parentheses are not balanced")))
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("(8/(4-2)")) == Right(new ExpressionError("Parentheses are not balanced")))
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("8/(4-2))")) == Right(new ExpressionError("Parentheses are not balanced")))
+  }
+
+  it should "return an error when expression is invalid" in {
+    assert(NotationConverter.fromInfixToPostfix(List[Token](new Token("~", TokenKind.Operator, 2))) == Right(new ExpressionError(s"Failed to parse '~':2 token")))
+  }
 }
