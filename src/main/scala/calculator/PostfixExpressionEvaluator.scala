@@ -3,18 +3,19 @@ package main.scala.calculator
 import scala.collection.mutable.Stack
 
 object PostfixExpressionEvaluator {
-  def Evaluate(operands: List[Token]): Either[Double, ExpressionError] = {
+  def evaluate(postfixTokens: List[Token]): Either[Double, ExpressionError] = {
     val operandsStack = Stack[String]()
-    operands.foreach(token => {
-      token.Type match {
-        case TokenType.Number => operandsStack.push(token.Text)
-        case TokenType.Operator => {
+    postfixTokens.foreach(token => {
+      token.kind match {
+        case TokenKind.Number =>
+          operandsStack.push(token.text)
+        case TokenKind.Operator => {
           if (operandsStack.length < 2) {
             return Right(new ExpressionError(s"Insufficient number of operands for ${token} operator"))
           }
           val right = operandsStack.pop().toDouble
           val left = operandsStack.pop().toDouble
-          val result: Double = token.Text match {
+          val result: Double = token.text match {
             case "+" => left + right
             case "-" => left - right
             case "*" => left * right

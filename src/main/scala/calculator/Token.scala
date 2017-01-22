@@ -1,14 +1,13 @@
 package main.scala.calculator
 
-import main.scala.calculator.TokenType._
+object TokenKind extends Enumeration {
+  type TokenKind = Value
+  val Number, Operator = Value
+}
 
-class Token(text: String, `type`: TokenType, position: Int) {
-  def Text = text
+import TokenKind._
 
-  def Type = `type`
-
-  def Position = position
-
+class Token(val text: String, val kind: TokenKind, val position: Int) {
   def canEqual(a: Any) = a.isInstanceOf[Token]
 
   override def equals(that: Any): Boolean =
@@ -20,9 +19,9 @@ class Token(text: String, `type`: TokenType, position: Int) {
   override def hashCode: Int = {
     val prime = 31
     var result = 1
-    result = prime * result + (if (Text == null) 0 else Text.hashCode)
-    result = prime * result + Type.hashCode();
-    result = prime * result + Position;
+    result = prime * result + (if (text == null) 0 else text.hashCode)
+    result = prime * result + kind.hashCode();
+    result = prime * result + position;
     return result
   }
 
