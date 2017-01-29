@@ -1,6 +1,6 @@
 # Calculator
 ### Build and tests status
-master | [TBA]
+master | [![Build Status](https://travis-ci.org/sirIrishman/calculator.svg?branch=master)](https://travis-ci.org/sirIrishman/calculator)
 ---|---
 ---
 
