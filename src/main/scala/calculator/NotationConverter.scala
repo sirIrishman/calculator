@@ -32,7 +32,7 @@ object NotationConverter {
               operatorsStack.pop()
             }
             case operator if operators contains operator => {
-              if (!operatorsStack.isEmpty && operatorsStack.head.text != "(" && precedence(operator) >= precedence(operatorsStack.head.text)) {
+              while (!operatorsStack.isEmpty && operatorsStack.head.text != "(" && precedence(operator) >= precedence(operatorsStack.head.text)) {
                 postfixTokens += operatorsStack.pop()
               }
               operatorsStack.push(token)
