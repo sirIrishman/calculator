@@ -1,7 +1,7 @@
 package main.scala.calculator
 
-class Calculator {
-  def calcInfix(infixExpression: String): Either[String, ExpressionError] = {
+class InfixCalculator {
+  def calculate(infixExpression: String): Either[String, ExpressionError] = {
     val safeInfixExpression = if (infixExpression == null) "" else infixExpression
 
     val infixTokens = Tokenizer.tokenize(safeInfixExpression) match {

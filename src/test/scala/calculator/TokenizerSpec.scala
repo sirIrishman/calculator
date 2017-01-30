@@ -4,7 +4,7 @@ import org.scalatest.FlatSpec
 import main.scala.calculator._
 
 class TokenizerSpec extends FlatSpec {
-  behavior of "Tokenizer Tokenize method"
+  behavior of "Tokenizer tokenize method"
 
   // single number
   it should "process single zero" in {

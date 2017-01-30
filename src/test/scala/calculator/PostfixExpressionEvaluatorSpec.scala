@@ -4,7 +4,7 @@ import org.scalatest.FlatSpec
 import main.scala.calculator._
 
 class PostfixExpressionEvaluatorSpec extends FlatSpec {
-  behavior of "PostfixExpressionEvaluator Evaluate method"
+  behavior of "PostfixExpressionEvaluator evaluate method"
 
   private def Tokenize(input: String): List[Token] = Tokenizer.tokenize(input).left.get
 
@@ -33,7 +33,7 @@ class PostfixExpressionEvaluatorSpec extends FlatSpec {
     assert(PostfixExpressionEvaluator.evaluate(Tokenize("1.25 3 11.25 * +")) == Left(35.0))
   }
 
-  it should "divide and divide positive numbers with positive result" in {
+  it should "divide and subtract positive numbers with positive result" in {
     assert(PostfixExpressionEvaluator.evaluate(Tokenize("60.003 3 / 1 -")) == Left(19.001))
   }
 

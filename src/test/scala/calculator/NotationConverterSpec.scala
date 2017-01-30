@@ -4,7 +4,7 @@ import org.scalatest.FlatSpec
 import main.scala.calculator._
 
 class NotationConverterSpec extends FlatSpec {
-  behavior of "NotationConverter FromInfixToPostfix method"
+  behavior of "NotationConverter fromInfixToPostfix method"
 
   private def Tokenize(input: String): List[Token] = Tokenizer.tokenize(input).left.get
 
