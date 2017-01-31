@@ -15,10 +15,10 @@ object NotationConverter {
     val postfixTokens = ListBuffer[Token]()
     val operatorsStack = Stack[Token]()
     infixTokens.foreach(token => {
-      token.kind match {
-        case TokenKind.Number =>
+      token match {
+        case NumberToken(_, _) =>
           postfixTokens += token
-        case TokenKind.Operator =>
+        case OperatorToken(_, _) =>
           token.text match {
             case "(" =>
               operatorsStack.push(token)

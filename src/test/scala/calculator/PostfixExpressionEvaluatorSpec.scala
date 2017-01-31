@@ -45,11 +45,10 @@ class PostfixExpressionEvaluatorSpec extends FlatSpec {
   }
 
   it should "return an error when operator is unknown" in {
-    assert(PostfixExpressionEvaluator.evaluate(List[Token](
-      new Token("1", TokenKind.Number, 0),
-      new Token("2", TokenKind.Number, 1),
-      new Token("~", TokenKind.Operator, 2)
-    )) == Right(new ExpressionError("Failed to parse '~':2 token")))
+    assert(
+      PostfixExpressionEvaluator.evaluate(List[Token](NumberToken("1", 0), NumberToken("2", 1), OperatorToken("~", 2))) ==
+        Right(new ExpressionError("Failed to parse '~':2 token"))
+    )
   }
 
   it should "return an error when few operands are left after evaluation" in {

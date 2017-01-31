@@ -8,52 +8,52 @@ class TokenizerSpec extends FlatSpec {
 
   // single number
   it should "process single zero" in {
-    assert(Tokenizer.tokenize("0") == Left(List(new Token("0", TokenKind.Number, 0))))
-    assert(Tokenizer.tokenize("0.0") == Left(List(new Token("0.0", TokenKind.Number, 0))))
+    assert(Tokenizer.tokenize("0") == Left(List(NumberToken("0", 0))))
+    assert(Tokenizer.tokenize("0.0") == Left(List(NumberToken("0.0", 0))))
   }
 
   it should "process single integer number" in {
-    assert(Tokenizer.tokenize("12") == Left(List(new Token("12", TokenKind.Number, 0))))
-    assert(Tokenizer.tokenize("-12") == Left(List(new Token("-12", TokenKind.Number, 0))))
-    assert(Tokenizer.tokenize(" 12  ") == Left(List(new Token("12", TokenKind.Number, 1))))
-    assert(Tokenizer.tokenize(" -12  ") == Left(List(new Token("-12", TokenKind.Number, 1))))
-    assert(Tokenizer.tokenize("  12 ") == Left(List(new Token("12", TokenKind.Number, 2))))
-    assert(Tokenizer.tokenize("  -12 ") == Left(List(new Token("-12", TokenKind.Number, 2))))
+    assert(Tokenizer.tokenize("12") == Left(List(NumberToken("12", 0))))
+    assert(Tokenizer.tokenize("-12") == Left(List(NumberToken("-12", 0))))
+    assert(Tokenizer.tokenize(" 12  ") == Left(List(NumberToken("12", 1))))
+    assert(Tokenizer.tokenize(" -12  ") == Left(List(NumberToken("-12", 1))))
+    assert(Tokenizer.tokenize("  12 ") == Left(List(NumberToken("12", 2))))
+    assert(Tokenizer.tokenize("  -12 ") == Left(List(NumberToken("-12", 2))))
     assert(Tokenizer.tokenize("(654)") ==
       Left(List(
-        new Token("(", TokenKind.Operator, 0),
-        new Token("654", TokenKind.Number, 1),
-        new Token(")", TokenKind.Operator, 4)
+        OperatorToken("(", 0),
+        NumberToken("654", 1),
+        OperatorToken(")", 4)
       )))
     assert(Tokenizer.tokenize("(-654)") ==
       Left(List(
-        new Token("(", TokenKind.Operator, 0),
-        new Token("-654", TokenKind.Number, 1),
-        new Token(")", TokenKind.Operator, 5)
+        OperatorToken("(", 0),
+        NumberToken("-654", 1),
+        OperatorToken(")", 5)
       )))
     assert(Tokenizer.tokenize(" (12)   ") ==
       Left(List(
-        new Token("(", TokenKind.Operator, 1),
-        new Token("12", TokenKind.Number, 2),
-        new Token(")", TokenKind.Operator, 4)
+        OperatorToken("(", 1),
+        NumberToken("12", 2),
+        OperatorToken(")", 4)
       )))
   }
 
   it should "process single float number" in {
-    assert(Tokenizer.tokenize("5.46") == Left(List(new Token("5.46", TokenKind.Number, 0))))
-    assert(Tokenizer.tokenize("-5.46") == Left(List(new Token("-5.46", TokenKind.Number, 0))))
+    assert(Tokenizer.tokenize("5.46") == Left(List(NumberToken("5.46", 0))))
+    assert(Tokenizer.tokenize("-5.46") == Left(List(NumberToken("-5.46", 0))))
     assert(Tokenizer.tokenize("(94.0551)") ==
       Left(List(
-        new Token("(", TokenKind.Operator, 0),
-        new Token("94.0551", TokenKind.Number, 1),
-        new Token(")", TokenKind.Operator, 8)
+        OperatorToken("(", 0),
+        NumberToken("94.0551", 1),
+        OperatorToken(")", 8)
       )))
 
     assert(Tokenizer.tokenize("(-94.0551)") ==
       Left(List(
-        new Token("(", TokenKind.Operator, 0),
-        new Token("-94.0551", TokenKind.Number, 1),
-        new Token(")", TokenKind.Operator, 9)
+        OperatorToken("(", 0),
+        NumberToken("-94.0551", 1),
+        OperatorToken(")", 9)
       )))
   }
 
@@ -61,20 +61,20 @@ class TokenizerSpec extends FlatSpec {
   it should "process integer numbers with operators" in {
     assert(Tokenizer.tokenize("0+11*222") ==
       Left(List(
-        new Token("0", TokenKind.Number, 0),
-        new Token("+", TokenKind.Operator, 1),
-        new Token("11", TokenKind.Number, 2),
-        new Token("*", TokenKind.Operator, 4),
-        new Token("222", TokenKind.Number, 5)
+        NumberToken("0", 0),
+        OperatorToken("+", 1),
+        NumberToken("11", 2),
+        OperatorToken("*", 4),
+        NumberToken("222", 5)
       )))
 
     assert(Tokenizer.tokenize("0 + 11 * 222") ==
       Left(List(
-        new Token("0", TokenKind.Number, 0),
-        new Token("+", TokenKind.Operator, 2),
-        new Token("11", TokenKind.Number, 4),
-        new Token("*", TokenKind.Operator, 7),
-        new Token("222", TokenKind.Number, 9)
+        NumberToken("0", 0),
+        OperatorToken("+", 2),
+        NumberToken("11", 4),
+        OperatorToken("*", 7),
+        NumberToken("222", 9)
       ))
     )
   }
@@ -82,82 +82,82 @@ class TokenizerSpec extends FlatSpec {
   it should "process float numbers with operators" in {
     assert(Tokenizer.tokenize("11.99/4.0-3.5") ==
       Left(List(
-        new Token("11.99", TokenKind.Number, 0),
-        new Token("/", TokenKind.Operator, 5),
-        new Token("4.0", TokenKind.Number, 6),
-        new Token("-", TokenKind.Operator, 9),
-        new Token("3.5", TokenKind.Number, 10)
+        NumberToken("11.99", 0),
+        OperatorToken("/", 5),
+        NumberToken("4.0", 6),
+        OperatorToken("-", 9),
+        NumberToken("3.5", 10)
       )))
 
     assert(Tokenizer.tokenize("11.99 / 4.0 - 3.5") ==
       Left(List(
-        new Token("11.99", TokenKind.Number, 0),
-        new Token("/", TokenKind.Operator, 6),
-        new Token("4.0", TokenKind.Number, 8),
-        new Token("-", TokenKind.Operator, 12),
-        new Token("3.5", TokenKind.Number, 14)
+        NumberToken("11.99", 0),
+        OperatorToken("/", 6),
+        NumberToken("4.0", 8),
+        OperatorToken("-", 12),
+        NumberToken("3.5", 14)
       )))
   }
 
   it should "process numbers with operators and parentheses" in {
     assert(Tokenizer.tokenize("11.99/((4.0-3)-1)") ==
       Left(List(
-        new Token("11.99", TokenKind.Number, 0),
-        new Token("/", TokenKind.Operator, 5),
-        new Token("(", TokenKind.Operator, 6),
-        new Token("(", TokenKind.Operator, 7),
-        new Token("4.0", TokenKind.Number, 8),
-        new Token("-", TokenKind.Operator, 11),
-        new Token("3", TokenKind.Number, 12),
-        new Token(")", TokenKind.Operator, 13),
-        new Token("-", TokenKind.Operator, 14),
-        new Token("1", TokenKind.Number, 15),
-        new Token(")", TokenKind.Operator, 16)
+        NumberToken("11.99", 0),
+        OperatorToken("/", 5),
+        OperatorToken("(", 6),
+        OperatorToken("(", 7),
+        NumberToken("4.0", 8),
+        OperatorToken("-", 11),
+        NumberToken("3", 12),
+        OperatorToken(")", 13),
+        OperatorToken("-", 14),
+        NumberToken("1", 15),
+        OperatorToken(")", 16)
       )))
 
     assert(Tokenizer.tokenize("11.99 / ( ( 4.0 - 3 ) - 1 )") ==
       Left(List(
-        new Token("11.99", TokenKind.Number, 0),
-        new Token("/", TokenKind.Operator, 6),
-        new Token("(", TokenKind.Operator, 8),
-        new Token("(", TokenKind.Operator, 10),
-        new Token("4.0", TokenKind.Number, 12),
-        new Token("-", TokenKind.Operator, 16),
-        new Token("3", TokenKind.Number, 18),
-        new Token(")", TokenKind.Operator, 20),
-        new Token("-", TokenKind.Operator, 22),
-        new Token("1", TokenKind.Number, 24),
-        new Token(")", TokenKind.Operator, 26)
+        NumberToken("11.99", 0),
+        OperatorToken("/", 6),
+        OperatorToken("(", 8),
+        OperatorToken("(", 10),
+        NumberToken("4.0", 12),
+        OperatorToken("-", 16),
+        NumberToken("3", 18),
+        OperatorToken(")", 20),
+        OperatorToken("-", 22),
+        NumberToken("1", 24),
+        OperatorToken(")", 26)
       )))
 
     assert(Tokenizer.tokenize("-11.99/((-4.0*-3)-1)") ==
       Left(List(
-        new Token("-11.99", TokenKind.Number, 0),
-        new Token("/", TokenKind.Operator, 6),
-        new Token("(", TokenKind.Operator, 7),
-        new Token("(", TokenKind.Operator, 8),
-        new Token("-4.0", TokenKind.Number, 9),
-        new Token("*", TokenKind.Operator, 13),
-        new Token("-3", TokenKind.Number, 14),
-        new Token(")", TokenKind.Operator, 16),
-        new Token("-", TokenKind.Operator, 17),
-        new Token("1", TokenKind.Number, 18),
-        new Token(")", TokenKind.Operator, 19)
+        NumberToken("-11.99", 0),
+        OperatorToken("/", 6),
+        OperatorToken("(", 7),
+        OperatorToken("(", 8),
+        NumberToken("-4.0", 9),
+        OperatorToken("*", 13),
+        NumberToken("-3", 14),
+        OperatorToken(")", 16),
+        OperatorToken("-", 17),
+        NumberToken("1", 18),
+        OperatorToken(")", 19)
       )))
 
     assert(Tokenizer.tokenize("-11.99 / ( ( -4.0 * -3 ) - 1 )") ==
       Left(List(
-        new Token("-11.99", TokenKind.Number, 0),
-        new Token("/", TokenKind.Operator, 7),
-        new Token("(", TokenKind.Operator, 9),
-        new Token("(", TokenKind.Operator, 11),
-        new Token("-4.0", TokenKind.Number, 13),
-        new Token("*", TokenKind.Operator, 18),
-        new Token("-3", TokenKind.Number, 20),
-        new Token(")", TokenKind.Operator, 23),
-        new Token("-", TokenKind.Operator, 25),
-        new Token("1", TokenKind.Number, 27),
-        new Token(")", TokenKind.Operator, 29)
+        NumberToken("-11.99", 0),
+        OperatorToken("/", 7),
+        OperatorToken("(", 9),
+        OperatorToken("(", 11),
+        NumberToken("-4.0", 13),
+        OperatorToken("*", 18),
+        NumberToken("-3", 20),
+        OperatorToken(")", 23),
+        OperatorToken("-", 25),
+        NumberToken("1", 27),
+        OperatorToken(")", 29)
       )))
 
   }

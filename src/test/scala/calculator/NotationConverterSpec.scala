@@ -26,11 +26,11 @@ class NotationConverterSpec extends FlatSpec {
   it should "process operators with the same precedence: +, -" in {
     assert(NotationConverter.fromInfixToPostfix(Tokenize("1+2-3")) ==
       Left(List[Token](
-        new Token("1", TokenKind.Number, 0),
-        new Token("2", TokenKind.Number, 2),
-        new Token("+", TokenKind.Operator, 1),
-        new Token("3", TokenKind.Number, 4),
-        new Token("-", TokenKind.Operator, 3)
+        NumberToken("1", 0),
+        NumberToken("2", 2),
+        OperatorToken("+", 1),
+        NumberToken("3", 4),
+        OperatorToken("-", 3)
       ))
     )
   }
@@ -38,11 +38,11 @@ class NotationConverterSpec extends FlatSpec {
   it should "process operators with the same precedence: *, /" in {
     assert(NotationConverter.fromInfixToPostfix(Tokenize("1*4/2")) ==
       Left(List[Token](
-        new Token("1", TokenKind.Number, 0),
-        new Token("4", TokenKind.Number, 2),
-        new Token("*", TokenKind.Operator, 1),
-        new Token("2", TokenKind.Number, 4),
-        new Token("/", TokenKind.Operator, 3)
+        NumberToken("1", 0),
+        NumberToken("4", 2),
+        OperatorToken("*", 1),
+        NumberToken("2", 4),
+        OperatorToken("/", 3)
       ))
     )
   }
@@ -50,11 +50,11 @@ class NotationConverterSpec extends FlatSpec {
   it should "process operators with a different precedence: +, *" in {
     assert(NotationConverter.fromInfixToPostfix(Tokenize("1+3*4")) ==
       Left(List[Token](
-        new Token("1", TokenKind.Number, 0),
-        new Token("3", TokenKind.Number, 2),
-        new Token("4", TokenKind.Number, 4),
-        new Token("*", TokenKind.Operator, 3),
-        new Token("+", TokenKind.Operator, 1)
+        NumberToken("1", 0),
+        NumberToken("3", 2),
+        NumberToken("4", 4),
+        OperatorToken("*", 3),
+        OperatorToken("+", 1)
       ))
     )
   }
@@ -62,11 +62,11 @@ class NotationConverterSpec extends FlatSpec {
   it should "process operators with a different precedence: /, -" in {
     assert(NotationConverter.fromInfixToPostfix(Tokenize("8/2-2")) ==
       Left(List[Token](
-        new Token("8", TokenKind.Number, 0),
-        new Token("2", TokenKind.Number, 2),
-        new Token("/", TokenKind.Operator, 1),
-        new Token("2", TokenKind.Number, 4),
-        new Token("-", TokenKind.Operator, 3)
+        NumberToken("8", 0),
+        NumberToken("2", 2),
+        OperatorToken("/", 1),
+        NumberToken("2", 4),
+        OperatorToken("-", 3)
       ))
     )
   }
@@ -75,11 +75,11 @@ class NotationConverterSpec extends FlatSpec {
   it should "process parentheses and operators with the same precedence: +, -" in {
     assert(NotationConverter.fromInfixToPostfix(Tokenize("1+(4-3)")) ==
       Left(List[Token](
-        new Token("1", TokenKind.Number, 0),
-        new Token("4", TokenKind.Number, 3),
-        new Token("3", TokenKind.Number, 5),
-        new Token("-", TokenKind.Operator, 4),
-        new Token("+", TokenKind.Operator, 1)
+        NumberToken("1", 0),
+        NumberToken("4", 3),
+        NumberToken("3", 5),
+        OperatorToken("-", 4),
+        OperatorToken("+", 1)
       ))
     )
   }
@@ -87,11 +87,11 @@ class NotationConverterSpec extends FlatSpec {
   it should "process parentheses and operators with the same precedence: *, /" in {
     assert(NotationConverter.fromInfixToPostfix(Tokenize("1*(4/2)")) ==
       Left(List[Token](
-        new Token("1", TokenKind.Number, 0),
-        new Token("4", TokenKind.Number, 3),
-        new Token("2", TokenKind.Number, 5),
-        new Token("/", TokenKind.Operator, 4),
-        new Token("*", TokenKind.Operator, 1)
+        NumberToken("1", 0),
+        NumberToken("4", 3),
+        NumberToken("2", 5),
+        OperatorToken("/", 4),
+        OperatorToken("*", 1)
       ))
     )
   }
@@ -99,11 +99,11 @@ class NotationConverterSpec extends FlatSpec {
   it should "process parentheses and operators with a different precedence: +, *" in {
     assert(NotationConverter.fromInfixToPostfix(Tokenize("(1+3)*4")) ==
       Left(List[Token](
-        new Token("1", TokenKind.Number, 1),
-        new Token("3", TokenKind.Number, 3),
-        new Token("+", TokenKind.Operator, 2),
-        new Token("4", TokenKind.Number, 6),
-        new Token("*", TokenKind.Operator, 5)
+        NumberToken("1", 1),
+        NumberToken("3", 3),
+        OperatorToken("+", 2),
+        NumberToken("4", 6),
+        OperatorToken("*", 5)
       ))
     )
   }
@@ -111,11 +111,11 @@ class NotationConverterSpec extends FlatSpec {
   it should "process parentheses and operators with a different precedence : /, -" in {
     assert(NotationConverter.fromInfixToPostfix(Tokenize("8/(4-2)")) ==
       Left(List[Token](
-        new Token("8", TokenKind.Number, 0),
-        new Token("4", TokenKind.Number, 3),
-        new Token("2", TokenKind.Number, 5),
-        new Token("-", TokenKind.Operator, 4),
-        new Token("/", TokenKind.Operator, 1)
+        NumberToken("8", 0),
+        NumberToken("4", 3),
+        NumberToken("2", 5),
+        OperatorToken("-", 4),
+        OperatorToken("/", 1)
       ))
     )
   }
@@ -123,17 +123,17 @@ class NotationConverterSpec extends FlatSpec {
   it should "process parentheses and operators with a different precedence : /, -, *, +" in {
     assert(NotationConverter.fromInfixToPostfix(Tokenize("1 / 2 - 4 * -1 + 3 * -0.5")) ==
       Left(List[Token](
-        new Token("1", TokenKind.Number, 0),
-        new Token("2", TokenKind.Number, 4),
-        new Token("/", TokenKind.Operator, 2),
-        new Token("4", TokenKind.Number, 8),
-        new Token("-1", TokenKind.Number, 12),
-        new Token("*", TokenKind.Operator, 10),
-        new Token("-", TokenKind.Operator, 6),
-        new Token("3", TokenKind.Number, 17),
-        new Token("-0.5", TokenKind.Number, 21),
-        new Token("*", TokenKind.Operator, 19),
-        new Token("+", TokenKind.Operator, 15)
+        NumberToken("1", 0),
+        NumberToken("2", 4),
+        OperatorToken("/", 2),
+        NumberToken("4", 8),
+        NumberToken("-1", 12),
+        OperatorToken("*", 10),
+        OperatorToken("-", 6),
+        NumberToken("3", 17),
+        NumberToken("-0.5", 21),
+        OperatorToken("*", 19),
+        OperatorToken("+", 15)
       ))
     )
   }
@@ -147,6 +147,6 @@ class NotationConverterSpec extends FlatSpec {
   }
 
   it should "return an error when expression is invalid" in {
-    assert(NotationConverter.fromInfixToPostfix(List[Token](new Token("~", TokenKind.Operator, 2))) == Right(new ExpressionError(s"Failed to parse '~':2 token")))
+    assert(NotationConverter.fromInfixToPostfix(List[Token](OperatorToken("~", 2))) == Right(new ExpressionError(s"Failed to parse '~':2 token")))
   }
 }

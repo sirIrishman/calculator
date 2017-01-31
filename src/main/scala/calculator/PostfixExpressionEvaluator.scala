@@ -6,10 +6,10 @@ object PostfixExpressionEvaluator {
   def evaluate(postfixTokens: List[Token]): Either[Double, ExpressionError] = {
     val operandsStack = Stack[String]()
     postfixTokens.foreach(token => {
-      token.kind match {
-        case TokenKind.Number =>
+      token match {
+        case NumberToken(_, _) =>
           operandsStack.push(token.text)
-        case TokenKind.Operator => {
+        case OperatorToken(_, _) => {
           if (operandsStack.length < 2) {
             return Right(new ExpressionError(s"Insufficient number of operands for ${token} operator"))
           }
