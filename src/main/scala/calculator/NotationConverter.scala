@@ -18,28 +18,23 @@ object NotationConverter {
       token match {
         case NumberToken(_, _) =>
           postfixTokens += token
-        case OperatorToken(_, _) =>
-          token.text match {
-            case "(" =>
-              operatorsStack.push(token)
-            case ")" => {
-              while (!operatorsStack.isEmpty && operatorsStack.head.text != "(") {
-                postfixTokens += operatorsStack.pop()
-              }
-              if (operatorsStack.isEmpty) {
-                return Right(new ExpressionError(s"Parentheses are not balanced"))
-              }
-              operatorsStack.pop()
-            }
-            case operator if operators contains operator => {
-              while (!operatorsStack.isEmpty && operatorsStack.head.text != "(" && precedence(operator) >= precedence(operatorsStack.head.text)) {
-                postfixTokens += operatorsStack.pop()
-              }
-              operatorsStack.push(token)
-            }
-            case _ =>
-              return Right(new ExpressionError(s"Failed to parse ${token} token"))
+        case OperatorToken("(", _) =>
+          operatorsStack.push(token)
+        case OperatorToken(")", _) => {
+          while (!operatorsStack.isEmpty && operatorsStack.head.text != "(") {
+            postfixTokens += operatorsStack.pop()
           }
+          if (operatorsStack.isEmpty) {
+            return Right(new ExpressionError(s"Parentheses are not balanced"))
+          }
+          operatorsStack.pop()
+        }
+        case OperatorToken(operator, _) if operators contains operator => {
+          while (!operatorsStack.isEmpty && operatorsStack.head.text != "(" && precedence(operator) >= precedence(operatorsStack.head.text)) {
+            postfixTokens += operatorsStack.pop()
+          }
+          operatorsStack.push(token)
+        }
         case _ =>
           return Right(new ExpressionError(s"Failed to parse ${token} token"))
       }
