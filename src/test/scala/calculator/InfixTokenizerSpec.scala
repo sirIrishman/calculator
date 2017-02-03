@@ -3,35 +3,35 @@ package test.scala.calculator
 import org.scalatest.FlatSpec
 import main.scala.calculator._
 
-class TokenizerSpec extends FlatSpec {
+class InfixTokenizerSpec extends FlatSpec {
   behavior of "Tokenizer tokenize method"
 
   // single number
   it should "process single zero" in {
-    assert(Tokenizer.tokenize("0") == Left(List(NumberToken("0", 0))))
-    assert(Tokenizer.tokenize("0.0") == Left(List(NumberToken("0.0", 0))))
+    assert(InfixTokenizer.tokenize("0") == Left(List(NumberToken("0", 0))))
+    assert(InfixTokenizer.tokenize("0.0") == Left(List(NumberToken("0.0", 0))))
   }
 
   it should "process single integer number" in {
-    assert(Tokenizer.tokenize("12") == Left(List(NumberToken("12", 0))))
-    assert(Tokenizer.tokenize("-12") == Left(List(NumberToken("-12", 0))))
-    assert(Tokenizer.tokenize(" 12  ") == Left(List(NumberToken("12", 1))))
-    assert(Tokenizer.tokenize(" -12  ") == Left(List(NumberToken("-12", 1))))
-    assert(Tokenizer.tokenize("  12 ") == Left(List(NumberToken("12", 2))))
-    assert(Tokenizer.tokenize("  -12 ") == Left(List(NumberToken("-12", 2))))
-    assert(Tokenizer.tokenize("(654)") ==
+    assert(InfixTokenizer.tokenize("12") == Left(List(NumberToken("12", 0))))
+    assert(InfixTokenizer.tokenize("-12") == Left(List(NumberToken("-12", 0))))
+    assert(InfixTokenizer.tokenize(" 12  ") == Left(List(NumberToken("12", 1))))
+    assert(InfixTokenizer.tokenize(" -12  ") == Left(List(NumberToken("-12", 1))))
+    assert(InfixTokenizer.tokenize("  12 ") == Left(List(NumberToken("12", 2))))
+    assert(InfixTokenizer.tokenize("  -12 ") == Left(List(NumberToken("-12", 2))))
+    assert(InfixTokenizer.tokenize("(654)") ==
       Left(List(
         OperatorToken("(", 0),
         NumberToken("654", 1),
         OperatorToken(")", 4)
       )))
-    assert(Tokenizer.tokenize("(-654)") ==
+    assert(InfixTokenizer.tokenize("(-654)") ==
       Left(List(
         OperatorToken("(", 0),
         NumberToken("-654", 1),
         OperatorToken(")", 5)
       )))
-    assert(Tokenizer.tokenize(" (12)   ") ==
+    assert(InfixTokenizer.tokenize(" (12)   ") ==
       Left(List(
         OperatorToken("(", 1),
         NumberToken("12", 2),
@@ -40,16 +40,16 @@ class TokenizerSpec extends FlatSpec {
   }
 
   it should "process single float number" in {
-    assert(Tokenizer.tokenize("5.46") == Left(List(NumberToken("5.46", 0))))
-    assert(Tokenizer.tokenize("-5.46") == Left(List(NumberToken("-5.46", 0))))
-    assert(Tokenizer.tokenize("(94.0551)") ==
+    assert(InfixTokenizer.tokenize("5.46") == Left(List(NumberToken("5.46", 0))))
+    assert(InfixTokenizer.tokenize("-5.46") == Left(List(NumberToken("-5.46", 0))))
+    assert(InfixTokenizer.tokenize("(94.0551)") ==
       Left(List(
         OperatorToken("(", 0),
         NumberToken("94.0551", 1),
         OperatorToken(")", 8)
       )))
 
-    assert(Tokenizer.tokenize("(-94.0551)") ==
+    assert(InfixTokenizer.tokenize("(-94.0551)") ==
       Left(List(
         OperatorToken("(", 0),
         NumberToken("-94.0551", 1),
@@ -59,7 +59,7 @@ class TokenizerSpec extends FlatSpec {
 
   // numbers with operators
   it should "process integer numbers with operators" in {
-    assert(Tokenizer.tokenize("0+11*222") ==
+    assert(InfixTokenizer.tokenize("0+11*222") ==
       Left(List(
         NumberToken("0", 0),
         OperatorToken("+", 1),
@@ -68,7 +68,7 @@ class TokenizerSpec extends FlatSpec {
         NumberToken("222", 5)
       )))
 
-    assert(Tokenizer.tokenize("0 + 11 * 222") ==
+    assert(InfixTokenizer.tokenize("0 + 11 * 222") ==
       Left(List(
         NumberToken("0", 0),
         OperatorToken("+", 2),
@@ -80,7 +80,7 @@ class TokenizerSpec extends FlatSpec {
   }
 
   it should "process float numbers with operators" in {
-    assert(Tokenizer.tokenize("11.99/4.0-3.5") ==
+    assert(InfixTokenizer.tokenize("11.99/4.0-3.5") ==
       Left(List(
         NumberToken("11.99", 0),
         OperatorToken("/", 5),
@@ -89,7 +89,7 @@ class TokenizerSpec extends FlatSpec {
         NumberToken("3.5", 10)
       )))
 
-    assert(Tokenizer.tokenize("11.99 / 4.0 - 3.5") ==
+    assert(InfixTokenizer.tokenize("11.99 / 4.0 - 3.5") ==
       Left(List(
         NumberToken("11.99", 0),
         OperatorToken("/", 6),
@@ -100,7 +100,7 @@ class TokenizerSpec extends FlatSpec {
   }
 
   it should "process numbers with operators and parentheses" in {
-    assert(Tokenizer.tokenize("11.99/((4.0-3)-1)") ==
+    assert(InfixTokenizer.tokenize("11.99/((4.0-3)-1)") ==
       Left(List(
         NumberToken("11.99", 0),
         OperatorToken("/", 5),
@@ -115,7 +115,7 @@ class TokenizerSpec extends FlatSpec {
         OperatorToken(")", 16)
       )))
 
-    assert(Tokenizer.tokenize("11.99 / ( ( 4.0 - 3 ) - 1 )") ==
+    assert(InfixTokenizer.tokenize("11.99 / ( ( 4.0 - 3 ) - 1 )") ==
       Left(List(
         NumberToken("11.99", 0),
         OperatorToken("/", 6),
@@ -130,7 +130,7 @@ class TokenizerSpec extends FlatSpec {
         OperatorToken(")", 26)
       )))
 
-    assert(Tokenizer.tokenize("-11.99/((-4.0*-3)-1)") ==
+    assert(InfixTokenizer.tokenize("-11.99/((-4.0*-3)-1)") ==
       Left(List(
         NumberToken("-11.99", 0),
         OperatorToken("/", 6),
@@ -145,7 +145,7 @@ class TokenizerSpec extends FlatSpec {
         OperatorToken(")", 19)
       )))
 
-    assert(Tokenizer.tokenize("-11.99 / ( ( -4.0 * -3 ) - 1 )") ==
+    assert(InfixTokenizer.tokenize("-11.99 / ( ( -4.0 * -3 ) - 1 )") ==
       Left(List(
         NumberToken("-11.99", 0),
         OperatorToken("/", 7),
@@ -163,8 +163,8 @@ class TokenizerSpec extends FlatSpec {
   }
   //invalid expressions
   it should "return an error when tokens are unrecognizable" in {
-    assert(Tokenizer.tokenize("12.34.56") == Right(new ExpressionError("Failed to parse '12.34.56':0 token")))
-    assert(Tokenizer.tokenize("12..34") == Right(new ExpressionError("Failed to parse '12.':0 token")))
-    assert(Tokenizer.tokenize(".12") == Right(new ExpressionError("Failed to parse '.12':0 token")))
+    assert(InfixTokenizer.tokenize("12.34.56") == Right(new ExpressionError("Failed to parse '12.34.56':0 token")))
+    assert(InfixTokenizer.tokenize("12..34") == Right(new ExpressionError("Failed to parse '12.':0 token")))
+    assert(InfixTokenizer.tokenize(".12") == Right(new ExpressionError("Failed to parse '.12':0 token")))
   }
 }

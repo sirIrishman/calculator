@@ -6,7 +6,7 @@ import main.scala.calculator._
 class NotationConverterSpec extends FlatSpec {
   behavior of "NotationConverter fromInfixToPostfix method"
 
-  private def Tokenize(input: String): List[Token] = Tokenizer.tokenize(input).left.get
+  private def Tokenize(input: String): List[Token] = InfixTokenizer.tokenize(input).left.get
 
   // edge cases
   it should "return empty token list" in {

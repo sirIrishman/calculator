@@ -7,7 +7,7 @@ class PostfixExpressionEvaluatorSpec extends FlatSpec {
   behavior of "PostfixExpressionEvaluator evaluate method"
 
   private def Tokenize(postfixExpression: String): List[Token] =
-    postfixExpression.split(" ").flatMap(element => Tokenizer.tokenize(element).left.get).toList
+    postfixExpression.split(" ").flatMap(element => InfixTokenizer.tokenize(element).left.get).toList
 
   // edge cases
   it should "return empty token list" in {
@@ -49,9 +49,9 @@ class PostfixExpressionEvaluatorSpec extends FlatSpec {
 
   //invalid expressions
   it should "return an error when can't find sufficient number of operator parameters" in {
-    assert(PostfixExpressionEvaluator.evaluate(Tokenizer.tokenize("4+").left.get) == Right(new ExpressionError("Insufficient number of operands for '+':1 operator")))
-    assert(PostfixExpressionEvaluator.evaluate(Tokenizer.tokenize("34--").left.get) == Right(new ExpressionError("Insufficient number of operands for '-':2 operator")))
-    assert(PostfixExpressionEvaluator.evaluate(Tokenizer.tokenize("1 2 * /").left.get) == Right(new ExpressionError("Insufficient number of operands for '/':6 operator")))
+    assert(PostfixExpressionEvaluator.evaluate(InfixTokenizer.tokenize("4+").left.get) == Right(new ExpressionError("Insufficient number of operands for '+':1 operator")))
+    assert(PostfixExpressionEvaluator.evaluate(InfixTokenizer.tokenize("34--").left.get) == Right(new ExpressionError("Insufficient number of operands for '-':2 operator")))
+    assert(PostfixExpressionEvaluator.evaluate(InfixTokenizer.tokenize("1 2 * /").left.get) == Right(new ExpressionError("Insufficient number of operands for '/':6 operator")))
   }
 
   it should "return an error when operator is unknown" in {

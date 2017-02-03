@@ -2,7 +2,7 @@ package main.scala.calculator
 
 import scala.collection.mutable.ListBuffer
 
-object Tokenizer {
+object InfixTokenizer {
 
   private object CharType extends Enumeration {
     type CharType = Value
@@ -61,7 +61,7 @@ object Tokenizer {
       case _ if char isDigit => Digit
       case _ if char isSpaceChar => Space
       case '.' => DecimalMark
-      case '+' | '-' | '*' | '/' | '(' | ')' => Operator
+      case '(' | ')' | '+' | '-' | '*' | '/' | '^' | '%' => Operator
     }
   }
 
