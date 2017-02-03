@@ -20,6 +20,8 @@ object PostfixExpressionEvaluator {
             case "-" => left - right
             case "*" => left * right
             case "/" => left / right
+            case "^" => Math.pow(left, right)
+            case "%" => left % right
             case _ => return Right(new ExpressionError(s"Failed to parse ${token} token"))
           }
           operandsStack.push(result.toString())

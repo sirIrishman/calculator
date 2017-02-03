@@ -6,7 +6,7 @@ object NotationConverter {
   // https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages
   val precedence = Map(
     "(" -> 1, ")" -> 1,
-    "*" -> 3, "/" -> 3,
+    "*" -> 3, "/" -> 3, "%" -> 3, "^" -> 3,
     "+" -> 4, "-" -> 4
   )
   val operators = precedence.keys.toList
