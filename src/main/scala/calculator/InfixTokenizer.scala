@@ -6,7 +6,7 @@ object InfixTokenizer {
 
   private object CharType extends Enumeration {
     type CharType = Value
-    val Space, Digit, DecimalMark, Operator = Value
+    val Space, Digit, DecimalMark, Operator, Letter = Value
   }
 
   import CharType._
@@ -30,17 +30,21 @@ object InfixTokenizer {
         case (Space, _) => {
           //do nothing
         }
-        case (Operator, Some(Digit))
+        case (Operator, Some(Digit)) |
+             (Operator, Some(Letter))
           if currentChar == '-' && (tokens.isEmpty || tokens.last.isInstanceOf[OperatorToken] && tokens.last.text != ")") =>
           accumulator += current
         case (Digit, Some(Digit)) |
              (Digit, Some(DecimalMark)) |
-             (DecimalMark, Some(Digit)) =>
+             (DecimalMark, Some(Digit)) |
+             (Letter, Some(Letter)) =>
           accumulator += current
         case (_, Some(Space)) |
              (_, Some(Operator)) |
+             (_, Some(Letter)) |
              (_, None) |
-             (Operator, _) => {
+             (Operator, _) |
+             (Letter, Some(Digit)) => {
           accumulator += current
           createTokenFromAccumulator() match {
             case Left(newToken) => tokens += newToken
@@ -60,6 +64,7 @@ object InfixTokenizer {
     return char match {
       case _ if char isDigit => Digit
       case _ if char isSpaceChar => Space
+      case _ if ('a' to 'z' contains char) || ('A' to 'Z' contains char) => Letter
       case '.' => DecimalMark
       case '(' | ')' | '+' | '-' | '*' | '/' | '^' | '%' => Operator
     }
@@ -83,6 +88,9 @@ object InfixTokenizer {
         Some(NumberToken(text, position))
       case Operator :: Nil =>
         Some(OperatorToken(text, position))
+      case Letter :: Nil |
+           Operator :: Letter :: Nil =>
+        Some(VariableToken(text, position))
       case _ => None
     }
   }

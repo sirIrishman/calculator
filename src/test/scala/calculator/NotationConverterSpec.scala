@@ -21,13 +21,17 @@ class NotationConverterSpec extends FlatSpec {
     val infix = Tokenize("3.12354")
     assert(NotationConverter.fromInfixToPostfix(infix) == Left(infix))
   }
+  it should "return single constant" in {
+    val infix = Tokenize("Pi")
+    assert(NotationConverter.fromInfixToPostfix(infix) == Left(infix))
+  }
 
   // operators
   it should "process operators with the same precedence: +, -" in {
-    assert(NotationConverter.fromInfixToPostfix(Tokenize("1+2-3")) ==
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("1+e-3")) ==
       Left(List[Token](
         NumberToken("1", 0),
-        NumberToken("2", 2),
+        VariableToken("e", 2),
         OperatorToken("+", 1),
         NumberToken("3", 4),
         OperatorToken("-", 3)
@@ -36,21 +40,21 @@ class NotationConverterSpec extends FlatSpec {
   }
 
   it should "process operators with the same precedence: *, /" in {
-    assert(NotationConverter.fromInfixToPostfix(Tokenize("1*4/2")) ==
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("1*Pi/2")) ==
       Left(List[Token](
         NumberToken("1", 0),
-        NumberToken("4", 2),
+        VariableToken("Pi", 2),
         OperatorToken("*", 1),
-        NumberToken("2", 4),
-        OperatorToken("/", 3)
+        NumberToken("2", 5),
+        OperatorToken("/", 4)
       ))
     )
   }
 
   it should "process operators with a different precedence: +, *" in {
-    assert(NotationConverter.fromInfixToPostfix(Tokenize("1+3*4")) ==
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("e+3*4")) ==
       Left(List[Token](
-        NumberToken("1", 0),
+        VariableToken("e", 0),
         NumberToken("3", 2),
         NumberToken("4", 4),
         OperatorToken("*", 3),
@@ -60,12 +64,12 @@ class NotationConverterSpec extends FlatSpec {
   }
 
   it should "process operators with a different precedence: /, -" in {
-    assert(NotationConverter.fromInfixToPostfix(Tokenize("8/2-2")) ==
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("8/2-Pi")) ==
       Left(List[Token](
         NumberToken("8", 0),
         NumberToken("2", 2),
         OperatorToken("/", 1),
-        NumberToken("2", 4),
+        VariableToken("Pi", 4),
         OperatorToken("-", 3)
       ))
     )
@@ -73,10 +77,10 @@ class NotationConverterSpec extends FlatSpec {
 
   // parentheses + operators
   it should "process parentheses and operators with the same precedence: +, -" in {
-    assert(NotationConverter.fromInfixToPostfix(Tokenize("1+(4-3)")) ==
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("1+(e-3)")) ==
       Left(List[Token](
         NumberToken("1", 0),
-        NumberToken("4", 3),
+        VariableToken("e", 3),
         NumberToken("3", 5),
         OperatorToken("-", 4),
         OperatorToken("+", 1)
@@ -85,21 +89,21 @@ class NotationConverterSpec extends FlatSpec {
   }
 
   it should "process parentheses and operators with the same precedence: *, /" in {
-    assert(NotationConverter.fromInfixToPostfix(Tokenize("1*(4/2)")) ==
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("1*(Pi/2)")) ==
       Left(List[Token](
         NumberToken("1", 0),
-        NumberToken("4", 3),
-        NumberToken("2", 5),
-        OperatorToken("/", 4),
+        VariableToken("Pi", 3),
+        NumberToken("2", 6),
+        OperatorToken("/", 5),
         OperatorToken("*", 1)
       ))
     )
   }
 
   it should "process parentheses and operators with a different precedence: +, *" in {
-    assert(NotationConverter.fromInfixToPostfix(Tokenize("(1+3)*4")) ==
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("(e+3)*4")) ==
       Left(List[Token](
-        NumberToken("1", 1),
+        VariableToken("e", 1),
         NumberToken("3", 3),
         OperatorToken("+", 2),
         NumberToken("4", 6),
@@ -109,11 +113,11 @@ class NotationConverterSpec extends FlatSpec {
   }
 
   it should "process parentheses and operators with a different precedence : /, -" in {
-    assert(NotationConverter.fromInfixToPostfix(Tokenize("8/(4-2)")) ==
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("8/(4-e)")) ==
       Left(List[Token](
         NumberToken("8", 0),
         NumberToken("4", 3),
-        NumberToken("2", 5),
+        VariableToken("e", 5),
         OperatorToken("-", 4),
         OperatorToken("/", 1)
       ))
@@ -121,18 +125,18 @@ class NotationConverterSpec extends FlatSpec {
   }
 
   it should "process parentheses and operators with a different precedence : /, -, *, +" in {
-    assert(NotationConverter.fromInfixToPostfix(Tokenize("1 / 2 - 4 * -1 + 3 * -0.5")) ==
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("1 / e - 4 * -1 + -Pi * -0.5")) ==
       Left(List[Token](
         NumberToken("1", 0),
-        NumberToken("2", 4),
+        VariableToken("e", 4),
         OperatorToken("/", 2),
         NumberToken("4", 8),
         NumberToken("-1", 12),
         OperatorToken("*", 10),
         OperatorToken("-", 6),
-        NumberToken("3", 17),
-        NumberToken("-0.5", 21),
-        OperatorToken("*", 19),
+        VariableToken("-Pi", 17),
+        NumberToken("-0.5", 23),
+        OperatorToken("*", 21),
         OperatorToken("+", 15)
       ))
     )
@@ -142,8 +146,8 @@ class NotationConverterSpec extends FlatSpec {
   it should "return an error when parentheses aren't balanced" in {
     assert(NotationConverter.fromInfixToPostfix(Tokenize("4-2)")) == Right(new ExpressionError("Parentheses are not balanced")))
     assert(NotationConverter.fromInfixToPostfix(Tokenize("(4-2")) == Right(new ExpressionError("Parentheses are not balanced")))
-    assert(NotationConverter.fromInfixToPostfix(Tokenize("(8/(4-2)")) == Right(new ExpressionError("Parentheses are not balanced")))
-    assert(NotationConverter.fromInfixToPostfix(Tokenize("8/(4-2))")) == Right(new ExpressionError("Parentheses are not balanced")))
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("(8/(4+e)")) == Right(new ExpressionError("Parentheses are not balanced")))
+    assert(NotationConverter.fromInfixToPostfix(Tokenize("8/(4+e))")) == Right(new ExpressionError("Parentheses are not balanced")))
   }
 
   it should "return an error when expression is invalid" in {

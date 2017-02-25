@@ -7,3 +7,5 @@ abstract class Token(val text: String, val position: Int) {
 case class NumberToken(override val text: String, override val position: Int) extends Token(text, position)
 
 case class OperatorToken(override val text: String, override val position: Int) extends Token(text, position)
+
+case class VariableToken(override val text: String, override val position: Int) extends Token(text, position)

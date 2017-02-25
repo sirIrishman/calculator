@@ -16,7 +16,8 @@ object NotationConverter {
     val operatorsStack = Stack[Token]()
     infixTokens.foreach(token => {
       token match {
-        case NumberToken(_, _) =>
+        case NumberToken(_, _) |
+             VariableToken(_, _) =>
           postfixTokens += token
         case OperatorToken("(", _) =>
           operatorsStack.push(token)

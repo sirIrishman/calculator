@@ -21,10 +21,16 @@ class PostfixExpressionEvaluatorSpec extends FlatSpec {
     assert(PostfixExpressionEvaluator.evaluate(Tokenize("13.45345")) == Left(13.45345))
   }
 
+  // single constant
+  it should "return resolved input single constant" in {
+    assert(PostfixExpressionEvaluator.evaluate(Tokenize("Pi")) == Left(3.141592653589793))
+    assert(PostfixExpressionEvaluator.evaluate(Tokenize("-E")) == Left(-2.718281828459045))
+  }
+
   // operators
-  it should "sum and subtract numbers" in {
-    assert(PostfixExpressionEvaluator.evaluate(Tokenize("1 4 + 3 -")) == Left(2.0))
-    assert(PostfixExpressionEvaluator.evaluate(Tokenize("23.008 9.1897 - -44 +")) == Left(-30.1817))
+  it should "sum and subtract" in {
+    assert(PostfixExpressionEvaluator.evaluate(Tokenize("1 4 + e -")) == Left(2.281718171540955))
+    assert(PostfixExpressionEvaluator.evaluate(Tokenize("23.008 Pi - -44 +")) == Left(-24.133592653589794))
   }
 
   it should "multiply and divide numbers" in {
@@ -33,13 +39,13 @@ class PostfixExpressionEvaluatorSpec extends FlatSpec {
   }
 
   it should "sum and multiply numbers" in {
-    assert(PostfixExpressionEvaluator.evaluate(Tokenize("1.25 3 11.25 * +")) == Left(35.0))
+    assert(PostfixExpressionEvaluator.evaluate(Tokenize("1.25 Pi 11.25 * +")) == Left(36.59291735288517))
     assert(PostfixExpressionEvaluator.evaluate(Tokenize("-3.000 8 11.25 + *")) == Left(-57.75))
   }
 
   it should "divide and subtract numbers" in {
     assert(PostfixExpressionEvaluator.evaluate(Tokenize("60.003 3 / 1 -")) == Left(19.001))
-    assert(PostfixExpressionEvaluator.evaluate(Tokenize("2.86 3.11 - 1 /")) == Left(-0.25))
+    assert(PostfixExpressionEvaluator.evaluate(Tokenize("e 3.11 - 1 /")) == Left(-0.3917181715409548))
   }
 
   it should "apply modulo and power" in {
@@ -50,6 +56,7 @@ class PostfixExpressionEvaluatorSpec extends FlatSpec {
   //invalid expressions
   it should "return an error when can't find sufficient number of operator parameters" in {
     assert(PostfixExpressionEvaluator.evaluate(InfixTokenizer.tokenize("4+").left.get) == Right(new ExpressionError("Insufficient number of operands for '+':1 operator")))
+    assert(PostfixExpressionEvaluator.evaluate(InfixTokenizer.tokenize("Pi*").left.get) == Right(new ExpressionError("Insufficient number of operands for '*':2 operator")))
     assert(PostfixExpressionEvaluator.evaluate(InfixTokenizer.tokenize("34--").left.get) == Right(new ExpressionError("Insufficient number of operands for '-':2 operator")))
     assert(PostfixExpressionEvaluator.evaluate(InfixTokenizer.tokenize("1 2 * /").left.get) == Right(new ExpressionError("Insufficient number of operands for '/':6 operator")))
   }
@@ -65,5 +72,10 @@ class PostfixExpressionEvaluatorSpec extends FlatSpec {
     assert(PostfixExpressionEvaluator.evaluate(Tokenize("1 2")) == Right(new ExpressionError("Invalid expression")))
   }
 
-  // TODO check numbers parsing
+  it should "return an error when variable is unknown" in {
+    assert(PostfixExpressionEvaluator.evaluate(List[Token](VariableToken("NotFound", 2))) == Right(new ExpressionError("Unknown 'NotFound':2 variable")))
+    assert(PostfixExpressionEvaluator.evaluate(List[Token](VariableToken("-NotFound", 2))) == Right(new ExpressionError("Unknown '-NotFound':2 variable")))
+  }
+
+  // TODO test invalid numbers parsing
 }

@@ -19,42 +19,29 @@ class InfixTokenizerSpec extends FlatSpec {
     assert(InfixTokenizer.tokenize(" -12  ") == Left(List(NumberToken("-12", 1))))
     assert(InfixTokenizer.tokenize("  12 ") == Left(List(NumberToken("12", 2))))
     assert(InfixTokenizer.tokenize("  -12 ") == Left(List(NumberToken("-12", 2))))
-    assert(InfixTokenizer.tokenize("(654)") ==
-      Left(List(
-        OperatorToken("(", 0),
-        NumberToken("654", 1),
-        OperatorToken(")", 4)
-      )))
-    assert(InfixTokenizer.tokenize("(-654)") ==
-      Left(List(
-        OperatorToken("(", 0),
-        NumberToken("-654", 1),
-        OperatorToken(")", 5)
-      )))
-    assert(InfixTokenizer.tokenize(" (12)   ") ==
-      Left(List(
-        OperatorToken("(", 1),
-        NumberToken("12", 2),
-        OperatorToken(")", 4)
-      )))
+    assert(InfixTokenizer.tokenize("(654)") == Left(List(OperatorToken("(", 0), NumberToken("654", 1), OperatorToken(")", 4))))
+    assert(InfixTokenizer.tokenize("(-654)") == Left(List(OperatorToken("(", 0), NumberToken("-654", 1), OperatorToken(")", 5))))
+    assert(InfixTokenizer.tokenize(" (12)   ") == Left(List(OperatorToken("(", 1), NumberToken("12", 2), OperatorToken(")", 4))))
   }
 
   it should "process single float number" in {
     assert(InfixTokenizer.tokenize("5.46") == Left(List(NumberToken("5.46", 0))))
+    assert(InfixTokenizer.tokenize("(94.0551)") == Left(List(OperatorToken("(", 0), NumberToken("94.0551", 1), OperatorToken(")", 8))))
     assert(InfixTokenizer.tokenize("-5.46") == Left(List(NumberToken("-5.46", 0))))
-    assert(InfixTokenizer.tokenize("(94.0551)") ==
-      Left(List(
-        OperatorToken("(", 0),
-        NumberToken("94.0551", 1),
-        OperatorToken(")", 8)
-      )))
+    assert(InfixTokenizer.tokenize("(-94.0551)") == Left(List(OperatorToken("(", 0), NumberToken("-94.0551", 1), OperatorToken(")", 9))))
+  }
 
-    assert(InfixTokenizer.tokenize("(-94.0551)") ==
-      Left(List(
-        OperatorToken("(", 0),
-        NumberToken("-94.0551", 1),
-        OperatorToken(")", 9)
-      )))
+  // constants
+  it should "process single constant" in {
+    assert(InfixTokenizer.tokenize("Pi") == Left(List(VariableToken("Pi", 0))))
+    assert(InfixTokenizer.tokenize("  Pi") == Left(List(VariableToken("Pi", 2))))
+    assert(InfixTokenizer.tokenize("  Pi  ") == Left(List(VariableToken("Pi", 2))))
+    assert(InfixTokenizer.tokenize("(Pi)") == Left(List(OperatorToken("(", 0), VariableToken("Pi", 1), OperatorToken(")", 3))))
+
+    assert(InfixTokenizer.tokenize("-e") == Left(List(VariableToken("-e", 0))))
+    assert(InfixTokenizer.tokenize("  -e") == Left(List(VariableToken("-e", 2))))
+    assert(InfixTokenizer.tokenize("  -e  ") == Left(List(VariableToken("-e", 2))))
+    assert(InfixTokenizer.tokenize("(-e)") == Left(List(OperatorToken("(", 0), VariableToken("-e", 1), OperatorToken(")", 3))))
   }
 
   // numbers with operators
@@ -115,7 +102,7 @@ class InfixTokenizerSpec extends FlatSpec {
         OperatorToken(")", 16)
       )))
 
-    assert(InfixTokenizer.tokenize("11.99 / ( ( 4.0 - 3 ) - 1 )") ==
+    assert(InfixTokenizer.tokenize("11.99 / ( ( 4.0 - Pi ) - 1 )") ==
       Left(List(
         NumberToken("11.99", 0),
         OperatorToken("/", 6),
@@ -123,14 +110,14 @@ class InfixTokenizerSpec extends FlatSpec {
         OperatorToken("(", 10),
         NumberToken("4.0", 12),
         OperatorToken("-", 16),
-        NumberToken("3", 18),
-        OperatorToken(")", 20),
-        OperatorToken("-", 22),
-        NumberToken("1", 24),
-        OperatorToken(")", 26)
+        VariableToken("Pi", 18),
+        OperatorToken(")", 21),
+        OperatorToken("-", 23),
+        NumberToken("1", 25),
+        OperatorToken(")", 27)
       )))
 
-    assert(InfixTokenizer.tokenize("-11.99/((-4.0*-3)-1)") ==
+    assert(InfixTokenizer.tokenize("-11.99/((-4.0*-Pi)-1)") ==
       Left(List(
         NumberToken("-11.99", 0),
         OperatorToken("/", 6),
@@ -138,11 +125,11 @@ class InfixTokenizerSpec extends FlatSpec {
         OperatorToken("(", 8),
         NumberToken("-4.0", 9),
         OperatorToken("*", 13),
-        NumberToken("-3", 14),
-        OperatorToken(")", 16),
-        OperatorToken("-", 17),
-        NumberToken("1", 18),
-        OperatorToken(")", 19)
+        VariableToken("-Pi", 14),
+        OperatorToken(")", 17),
+        OperatorToken("-", 18),
+        NumberToken("1", 19),
+        OperatorToken(")", 20)
       )))
 
     assert(InfixTokenizer.tokenize("-11.99 / ( ( -4.0 * -3 ) - 1 )") ==
